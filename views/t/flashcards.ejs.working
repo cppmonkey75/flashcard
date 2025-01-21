@@ -1,0 +1,13 @@
+<h1>Flashcards for <%= subject %> - <%= topic %></h1>
+
+<div class="flashcards-container">
+  <% flashcards.forEach((flashcard, index) => { %>
+    <div class="flashcard">
+      <div class="question"><%= flashcard.question %></div>
+      <div class="answer"><%= flashcard.answer %></div>
+    </div>
+  <% }); %>
+</div>
+
+<button onclick="window.location.href='/landing'">Back to Landing Page</button>
+

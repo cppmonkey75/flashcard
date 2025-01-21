@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retrieve Flashcards</title>
+  <style>
+    /* General page layout */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    label {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      flex: 1;
+      transition: background-color 0.3s ease;
+    }
+
+    .retrieve-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .retrieve-button:hover {
+      background-color: #45a049;
+    }
+
+    .back-button {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .back-button:hover {
+      background-color: #c9302c;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 1rem;
+      text-align: center;
+      margin-top: -10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Retrieve Flashcards</h1>
+    <form id="flashcardForm" method="POST" action="/retrieve-flashcards">
+      <!-- Error message -->
+      <div id="error-message" class="error-message">Please select both a subject and a topic.</div>
+
+      <!-- Subject dropdown -->
+      <div class="form-group">
+        <label for="subject">Subject:</label>
+        <select id="subject" name="subject">
+          <option value="">--Select Subject--</option>
+          <% subjects.forEach(subject => { %>
+            <option value="<%= subject %>"><%= subject %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Topic dropdown -->
+      <div class="form-group">
+        <label for="topic">Topic:</label>
+        <select id="topic" name="topic">
+          <option value="">--Select Topic--</option>
+        </select>
+      </div>
+
+      <!-- Button container -->
+      <div class="button-container">
+        <button type="submit" class="retrieve-button">Retrieve</button>
+        <button type="button" class="back-button" onclick="goBack()">Back</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Handle form submission
+    document.getElementById('flashcardForm').addEventListener('submit', function(e) {
+      const subject = document.getElementById('subject').value;
+      const topic = document.getElementById('topic').value;
+      const errorMessage = document.getElementById('error-message');
+
+      if (!subject || !topic) {
+        e.preventDefault(); // Prevent form submission
+        errorMessage.style.display = 'block'; // Show error message
+      } else {
+        errorMessage.style.display = 'none'; // Hide error message
+      }
+    });
+
+    // Handle subject selection change
+    document.getElementById('subject').addEventListener('change', function() {
+      const selectedSubject = this.value;
+      const topicDropdown = document.getElementById('topic');
+
+      // Clear the previous topics
+      topicDropdown.innerHTML = '<option value="">--Select Topic--</option>';
+
+      if (selectedSubject) {
+        // Make an AJAX request to get topics for the selected subject
+        fetch('/get-topics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ subject: selectedSubject })
+        })
+        .then(response => response.json())
+        .then(topics => {
+          if (topics.length > 0) {
+            topics.forEach(topic => {
+              const option = document.createElement('option');
+              option.value = topic.topic;
+              option.textContent = topic.topic;
+              topicDropdown.appendChild(option);
+            });
+          } else {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No topics available';
+            topicDropdown.appendChild(option);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching topics:', error);
+        });
+      }
+    });
+
+    // Handle back button click
+    function goBack() {
+      window.location.href = '/landing'; // Redirect to the landing page
+    }
+  </script>
+
+</body>
+</html>
+
