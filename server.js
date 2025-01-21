@@ -247,7 +247,8 @@ app.post('/retrieve-flashcards', (req, res) => {
         flashcards: result.rows,
         subject: subject,
         topic: topic,
-        currentFlashcardIndex: 0 // Set the starting flashcard index
+        currentFlashcardIndex: 0, // Set the starting flashcard index
+				totalFlashcards: result.rows.length
       });
     }
   );

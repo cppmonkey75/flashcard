@@ -43,11 +43,6 @@
       margin: 20px 0;
     }
 
-    /* Flip button functionality */
-    .flashcard .flipped {
-      background-color: #f1f1f1;
-    }
-
     /* Buttons container */
     .buttons {
       display: flex;
@@ -71,6 +66,12 @@
 
     .buttons button:hover {
       background-color: #45a049;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
     }
 
     /* Done button */
@@ -111,9 +112,17 @@
 
   <!-- Buttons for navigation -->
   <div class="buttons">
-    <button id="prevButton" onclick="showPrevCard()">Previous</button>
+    <button 
+      id="prevButton" 
+      onclick="showPrevCard()">
+      Previous
+    </button>
     <button id="flipButton" onclick="flipCard()">Flip</button>
-    <button id="nextButton" onclick="showNextCard()">Next</button>
+    <button 
+      id="nextButton" 
+      onclick="showNextCard()">
+      Next
+    </button>
   </div>
 
   <!-- Done button -->
@@ -140,23 +149,21 @@
       }
     }
 
-// Flip the current card
-function flipCard() {
-  flipped = !flipped;
-  const flashcardContent = document.getElementById('flashcardContent');
-  if (flipped) {
-    flashcardContent.innerHTML = `<p>${formatAnswer(flashcards[currentFlashcardIndex].answer)}</p>`; // Show answer with line breaks
-  } else {
-    flashcardContent.innerHTML = `<p>${flashcards[currentFlashcardIndex].question}</p>`; // Show question
-  }
-}
+    // Flip the current card
+    function flipCard() {
+      flipped = !flipped;
+      const flashcardContent = document.getElementById('flashcardContent');
+      if (flipped) {
+        flashcardContent.innerHTML = `<p>${formatAnswer(flashcards[currentFlashcardIndex].answer)}</p>`; // Show answer with line breaks
+      } else {
+        flashcardContent.innerHTML = `<p>${flashcards[currentFlashcardIndex].question}</p>`; // Show question
+      }
+    }
 
-// Function to replace newline characters with <br> tags
-function formatAnswer(answer) {
-  return answer.replace(/\n/g, '<br>'); // Replace new lines with <br> tags
-}
-
-
+    // Function to replace newline characters with <br> tags
+    function formatAnswer(answer) {
+      return answer.replace(/\n/g, '<br>'); // Replace new lines with <br> tags
+    }
 
     // Redirect to landing page
     function goToLandingPage() {
@@ -166,12 +173,22 @@ function formatAnswer(answer) {
     // Update the flashcard content
     function updateFlashcard() {
       const flashcardContent = document.getElementById('flashcardContent');
-      const flashcardQuestion = document.getElementById('flashcardQuestion');
       flipped = false; // Reset flip state
       flashcardContent.innerHTML = `<p>${flashcards[currentFlashcardIndex].question}</p>`;
+      updateButtonStates();
     }
+
+    // Update the navigation button states
+    function updateButtonStates() {
+      document.getElementById('prevButton').disabled = currentFlashcardIndex === 0;
+      document.getElementById('nextButton').disabled = currentFlashcardIndex === flashcards.length - 1;
+    }
+
+    // Initial button state update
+    document.addEventListener('DOMContentLoaded', () => {
+      updateButtonStates(); // Set correct state when the page loads
+    });
   </script>
 
 </body>
 </html>
-
