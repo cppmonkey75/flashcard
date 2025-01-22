@@ -23,13 +23,6 @@ const pool = new Pool({
   ssl: isProduction ? { rejectUnauthorized: false } : false, // Enable SSL in production
 });
 
-//const pool = new Pool({
-//  user: process.env.DB_USER,
-//  host: 'localhost',
-//  database: process.env.DB_NAME,
-//  password: process.env.DB_PASSWORD,
-//  port: 5432,
-//});
 
 // Middleware to parse JSON request bodies
 app.use(express.urlencoded({ extended: true }));
