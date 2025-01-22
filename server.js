@@ -55,7 +55,7 @@ passport.deserializeUser((user, done) => {
 // Choose redirect URI based on the environment
 const redirectUri =
   process.env.NODE_ENV === "production"
-    ? "https://flashcard_repo.onrender.com/auth/google/callback"
+    ? "https://flashcard-repo.onrender.com/auth/google/callback"
     : "http://localhost:3000/auth/google/callback";
 
 // Google OAuth strategy
