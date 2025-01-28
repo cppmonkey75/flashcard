@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Flashcard</title>
+  <title>Create Flashcard - Step 1</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -25,20 +25,12 @@
       margin-bottom: 8px;
       font-weight: bold;
     }
-    input[type="text"], textarea {
+    input[type="text"] {
       width: 100%;
       padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 4px;
-    }
-    textarea {
-      resize: vertical;
-      height: 150px;
-    }
-    .button-container {
-      display: flex;
-      justify-content: space-between;
     }
     button {
       padding: 10px 20px;
@@ -47,21 +39,22 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .save-button {
+    .next-button {
       background-color: #4CAF50;
       color: white;
     }
-    .finish-button {
+    .cancel-button {
       background-color: #f44336;
       color: white;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>Create Flashcard</h2>
-    <form id="create-flashcard-form">
+    <h2>Step 1: Subject & Topic</h2>
+    <form id="subject-topic-form">
       <div class="form-group">
         <label for="subject">Subject</label>
         <input type="text" id="subject" name="subject" required>
@@ -70,66 +63,34 @@
         <label for="topic">Topic</label>
         <input type="text" id="topic" name="topic" required>
       </div>
-      <div class="form-group">
-        <label for="question">Question</label>
-        <textarea id="question" name="question" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="answer">Answer</label>
-        <textarea id="answer" name="answer" required></textarea>
-      </div>
-
-      <div class="button-container">
-        <button type="button" class="save-button" onclick="saveFlashcard()">Save</button>
-        <button type="button" class="finish-button" onclick="finishPage()">Finish</button>
-      </div>
+      <button type="button" class="next-button" onclick="proceedToFlashcards()">Next</button>
+      <button type="button" class="cancel-button" onclick="cancel()">Cancel</button>
     </form>
   </div>
 
   <script>
-    function saveFlashcard() {
+    function proceedToFlashcards() {
       const subject = document.getElementById('subject').value;
       const topic = document.getElementById('topic').value;
-      const question = document.getElementById('question').value;
-      const answer = document.getElementById('answer').value;
 
-      if (!subject || !topic || !question || !answer) {
-        alert('All fields are required!');
+      if (!subject || !topic) {
+        alert('Subject and topic are required!');
         return;
       }
 
-      fetch('/flashcards', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subject: subject,
-          topic: topic,
-          question: question,
-          answer: answer
-        }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert('Error: ' + data.error);
-        } else {
-          alert('Flashcard saved successfully!');
-          document.getElementById('create-flashcard-form').reset();
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to save flashcard');
-      });
+      // Store subject and topic in session storage
+      sessionStorage.setItem('subject', subject);
+      sessionStorage.setItem('topic', topic);
+
+      // Redirect to the create flashcards page
+      window.location.href = '/create-flashcard.html';
     }
 
-    function finishPage() {
-      window.location.href = '/landing';  // Redirect to landing page
+    function cancel() {
+      // Redirect to the landing page (replace '/' with your actual landing page URL)
+      window.location.href = '/landing'; // Adjust the URL based on your landing page
     }
   </script>
 
 </body>
 </html>
-
