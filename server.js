@@ -247,6 +247,38 @@ app.post('/retrieve-flashcards', (req, res) => {
   );
 });
 
+// DELETE endpoint to delete a flashcard
+app.delete('/api/delete-flashcard/:id', (req, res) => {
+  const flashcardId = req.params.id;
+  console.log("Hit delete endpoint for id ",flashcardId);
+  if (!req.isAuthenticated() || !req.user) {
+    return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
+  }
+
+  const googleId = req.user.google_id;
+
+  // Check if the flashcard exists and belongs to the authenticated user
+  pool.query(
+    'DELETE FROM flashcards WHERE id = $1 AND google_id = $2 RETURNING *',
+    [flashcardId, googleId],
+    (err, result) => {
+      if (err) {
+        console.error('Error deleting flashcard:', err.stack);
+        return res.status(500).json({ error: 'Failed to delete flashcard' });
+      }
+
+      // If no rows are deleted, return a 404 (Not Found) error
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Flashcard not found or you do not have permission to delete it' });
+      }
+
+      // Return success message if the flashcard is deleted
+      res.status(200).json({ message: 'Flashcard deleted successfully' });
+    }
+  );
+});
+
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0",  () => {

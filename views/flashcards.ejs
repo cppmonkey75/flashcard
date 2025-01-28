@@ -92,6 +92,23 @@
       background-color: #0b7dda;
     }
 
+    /* Delete button */
+    #deleteButton {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1.2rem;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    #deleteButton:hover {
+      background-color: #e53935;
+    }
+
     /* Save as PDF button */
     #savePdfButton {
       margin-top: 20px; /* Same margin as Done button */
@@ -142,8 +159,11 @@
     </button>
   </div>
 
-  <!-- Done button -->
-  <button id="doneButton" onclick="goToLandingPage()">Done</button>
+  <!-- Done and Delete buttons -->
+  <div class="buttons">
+    <button id="doneButton" onclick="goToLandingPage()">Done</button>
+    <button id="deleteButton" onclick="deleteFlashcard()">Delete</button>
+  </div>
 
   <!-- Save as PDF button -->
   <button id="savePdfButton" onclick="saveAsPDF()">Save as PDF</button>
@@ -210,52 +230,82 @@
       updateButtonStates(); // Set correct state when the page loads
     });
 
-    function saveAsPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    if (flashcards.length === 0) {
-      alert('No flashcards to save.');
-      return;
+    // Delete flashcard function
+    function deleteFlashcard() {
+      const flashcardId = flashcards[currentFlashcardIndex].id;
+      fetch(`/api/delete-flashcard/${flashcardId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          // Remove the current flashcard from the UI
+          flashcards.splice(currentFlashcardIndex, 1);
+          if (flashcards.length > 0) {
+            // Move to the next card or previous card if it's the last card
+            if (currentFlashcardIndex >= flashcards.length) {
+              currentFlashcardIndex--;
+            }
+            updateFlashcard();
+          } else {
+            goToLandingPage(); // No flashcards left, go to landing page
+          }
+        } else {
+          alert('Failed to delete flashcard');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the flashcard');
+      });
     }
 
-    // Add subject and topic on the first page
-    doc.setFontSize(18);
-    doc.text('Subject: <%= subject %>', 10, 20);  // Subject as header
+    function saveAsPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-    doc.setFontSize(14);
-    doc.text('Topic: <%= topic %>', 10, 30);  // Topic as subheader
-
-    // Move to next page
-    doc.addPage();
-
-    // Set initial Y position for flashcards
-    let yPosition = 20;
-
-    // Loop through all flashcards and add one per page
-    flashcards.forEach((flashcard, index) => {
-      // Add flashcard question
-      doc.setFontSize(12);
-      doc.text(`Question ${index + 1}:`, 10, yPosition);
-      doc.text(flashcard.question, 10, yPosition + 10);
-
-      // Add flashcard answer
-      yPosition += 20; // Add space before answer
-      doc.text('Answer:', 10, yPosition);
-      doc.text(flashcard.answer, 10, yPosition + 10);
-
-      // Add a new page for the next flashcard if there are more
-      if (index !== flashcards.length - 1) {
-        doc.addPage();
-        yPosition = 20; // Reset position for the next page
+      if (flashcards.length === 0) {
+        alert('No flashcards to save.');
+        return;
       }
-    });
 
-    // Save the generated PDF
-    doc.save('flashcards.pdf');
-  }
- 
-</script>
+      // Add subject and topic on the first page
+      doc.setFontSize(18);
+      doc.text('Subject: <%= subject %>', 10, 20);  // Subject as header
+
+      doc.setFontSize(14);
+      doc.text('Topic: <%= topic %>', 10, 30);  // Topic as subheader
+
+      // Move to next page
+      doc.addPage();
+
+      // Set initial Y position for flashcards
+      let yPosition = 20;
+
+      // Loop through all flashcards and add one per page
+      flashcards.forEach((flashcard, index) => {
+        // Add flashcard question
+        doc.setFontSize(12);
+        doc.text(`Question ${index + 1}:`, 10, yPosition);
+        doc.text(flashcard.question, 10, yPosition + 10);
+
+        // Add flashcard answer
+        yPosition += 20; // Add space before answer
+        doc.text('Answer:', 10, yPosition);
+        doc.text(flashcard.answer, 10, yPosition + 10);
+
+        // Add a new page for the next flashcard if space is needed
+        if (index < flashcards.length - 1) {
+          doc.addPage();
+          yPosition = 20; // Reset Y position for the next page
+        }
+      });
+
+      doc.save('flashcards.pdf');
+    }
+  </script>
 
 </body>
 </html>
