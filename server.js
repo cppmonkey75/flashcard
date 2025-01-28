@@ -132,7 +132,7 @@ app.post('/flashcards', (req, res) => {
   }
 
   pool.query(
-    'INSERT INTO flashcards (google_id, subject, topic, question, answer) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    'INSERT INTO flashcards (google_id, subject, topic, question, answer) VALUES ($1, LOWER($2), LOWER($3), $4, $5) RETURNING *',
     [googleId, subject, topic, question, answer],
     (err, result) => {
       if (err) {
