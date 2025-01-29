@@ -77,7 +77,6 @@ app.get('/', (req, res) => {
 
 // Google login route
 app.get('/auth/google', (req, res, next) => {
-  console.log('Google auth route hit'); // Debugging log
   next();
 }, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
@@ -217,7 +216,6 @@ app.post('/get-topics', (req, res) => {
 
 app.post('/retrieve-flashcards', (req, res) => {
   const { subject, topic } = req.body;
-  console.log('subject & topic', subject, topic);
 
   if (!subject || !topic) {
     return res.status(400).json({ error: 'Subject and topic are required' });
@@ -250,7 +248,6 @@ app.post('/retrieve-flashcards', (req, res) => {
 // DELETE endpoint to delete a flashcard
 app.delete('/api/delete-flashcard/:id', (req, res) => {
   const flashcardId = req.params.id;
-  console.log("Hit delete endpoint for id ",flashcardId);
   if (!req.isAuthenticated() || !req.user) {
     return res.status(401).json({ error: 'Unauthorized: User not authenticated' });
   }
