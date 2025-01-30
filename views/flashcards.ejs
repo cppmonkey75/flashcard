@@ -282,25 +282,23 @@
       // Move to next page
       doc.addPage();
 
-      // Set initial Y position for flashcards
-      let yPosition = 20;
-
       // Loop through all flashcards and add one per page
       flashcards.forEach((flashcard, index) => {
-        // Add flashcard question
+        // Add flashcard question on a new page
         doc.setFontSize(12);
-        doc.text(`Question ${index + 1}:`, 10, yPosition);
-        doc.text(flashcard.question, 10, yPosition + 10);
+        doc.text(`Question ${index + 1}:`, 10, 20);
+        doc.text(flashcard.question, 10, 30);
 
-        // Add flashcard answer
-        yPosition += 20; // Add space before answer
-        doc.text('Answer:', 10, yPosition);
-        doc.text(flashcard.answer, 10, yPosition + 10);
+        // Add a new page for the answer
+        doc.addPage();
 
-        // Add a new page for the next flashcard if space is needed
+        // Add flashcard answer on the next page
+        doc.text(`Answer ${index + 1}:`, 10, 20);
+        doc.text(flashcard.answer, 10, 30);
+
+        // Add a new page for the next flashcard if it's not the last one
         if (index < flashcards.length - 1) {
           doc.addPage();
-          yPosition = 20; // Reset Y position for the next page
         }
       });
 
